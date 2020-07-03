@@ -24,6 +24,7 @@ import (
 	"rasp-cloud/controllers/api/fore_logs"
 	"rasp-cloud/controllers/iast"
 	"rasp-cloud/tools"
+	"rasp-cloud/controllers/test_api"
 )
 
 func InitRouter() {
@@ -147,7 +148,11 @@ func InitRouter() {
 	userNS := beego.NewNamespace("/user", beego.NSInclude(&api.UserController{}))
 	pingNS := beego.NewNamespace("/ping", beego.NSInclude(&controllers.PingController{}))
 	versionNS := beego.NewNamespace("/version", beego.NSInclude(&controllers.GeneralController{}))
+	//test router
+	testNS := beego.NewNamespace("/test_router", beego.NSInclude(&test_api.TestController{}))
 	ns := beego.NewNamespace("/v1")
+	//test router
+	ns.Namespace(testNS)
 	ns.Namespace(pingNS)
 	ns.Namespace(versionNS)
 	startType := *conf.AppConfig.Flag.StartType
