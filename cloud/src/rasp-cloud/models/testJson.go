@@ -1,7 +1,11 @@
 package models
 
 import (
-	
+	// "gopkg.in/mgo.v2"
+	// "gopkg.in/mgo.v2/bson"
+	"rasp-cloud/tools"
+	"rasp-cloud/mongo"
+	"github.com/astaxie/beego"
 )
 
 type TestJson struct {
@@ -84,4 +88,36 @@ type Upstream struct {
 	Req_total int `json:"req_total" `
 	Bytes_in int `json:"bytes_in" `
 	Bytes_out int `json:"bytes_out" `
+}
+
+// const (
+// 	appCollectionName = "test_collection"
+// 	configCollectionName = "config"
+// 	defaultAppName    = "PHP 示例应用"
+// 	SecreteMask       = "************"
+// 	DefalutPluginName = "plugin.js"
+// 	IastPluginName    = "iast.js"
+// )
+
+const (
+	testCollectionName  = "test_collection"
+)
+
+func init()  {
+	_, err := mongo.Count(testCollectionName)
+	if err != nil {
+		tools.Panic(tools.ErrCodeMongoInitFailed, "failed to get test_collection collection count", err)
+	}
+}
+
+func TestMgo() (err error) {
+	_, apps, err := GetAllApp(1, 10, true)
+	if err != nil {
+		beego.Error("failed to test App config", &err)
+		return 
+	}
+	if apps == nil {
+		apps = make([]*App, 0)
+	}
+	return
 }

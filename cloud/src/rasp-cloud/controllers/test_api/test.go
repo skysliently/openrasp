@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"rasp-cloud/models"
+	"rasp-cloud/models/waf"
 )
 
 type TestController struct {
@@ -118,4 +119,97 @@ func (o *TestController) UrlJsonTest()  {
 		o.ServeError(http.StatusBadRequest, strconv.Itoa(resp.StatusCode))
 	}
 	
+}
+
+// @router /testMgoFunc [get]
+func (o *TestController) TestMgoFunc()  {
+	err := models.TestMgo()
+	if err != nil {
+		o.ServeError(http.StatusBadRequest, err.Error())
+	}
+	o.Serve(map[string]interface{}{
+		"testresult": "success",
+	})
+	o.ServeWithEmptyData()
+}
+
+// @router /testWafFunc [get]
+func (o *TestController) TestWafFunc()  {
+	total, wafs, err := waf.GetAllWafIdSort()
+	if err != nil {
+		// o.ServeError(http.StatusBadRequest, err.Error())
+		o.ServeError(http.StatusBadRequest, "failed to get apps", err)
+	}
+	if wafs == nil {
+		wafs = make([]*waf.Waf, 0)
+		// o.ServeError(http.StatusBadRequest, "wafs is nil")/
+		var result = make(map[string]interface{})
+		result["total"] = total
+		result["wafs"] = wafs
+		result["wafs nil"] = "wafs nil"
+		o.Serve(result)
+	}else {
+		var result = make(map[string]interface{})
+		result["total"] = total
+		result["wafs"] = wafs
+		o.Serve(result)
+	}
+	
+}
+
+// @router /getWafStatus [post]
+func (o *TestController) GetWafStatus()  {
+	var param struct {
+		Id string `json:"id"`
+	}
+	o.UnmarshalJson(&param)
+	if param.Id == ""{
+		o.ServeError(http.StatusBadRequest, "Param can not be empty")
+	}
+	waf, err := waf.GetWafById(param.Id)
+	if err != nil {
+		o.ServeError(http.StatusBadRequest, "failed to get waf", err)
+	}
+	resp, err := http.Get(waf.Addr+"/api/stat")
+	if err != nil {
+		o.ServeError(http.StatusBadRequest, "failed to Request",err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == 200 {
+		var res *models.TestJson
+		json.Unmarshal(body,&res)
+		var result = make(map[string]interface{})
+		result["res"] = res
+		o.Serve(result)
+	}else {
+		o.ServeError(http.StatusBadRequest, strconv.Itoa(resp.StatusCode))
+	}
+}
+
+// @router /configNewWaf [post]
+func (o *TestController) ConfigNewWaf()  {
+	var param struct {
+		WafName string `json:"wafName"`
+		WafAddr string `json:"wafAddr"`
+	}
+	o.UnmarshalJson(&param)
+	if param.WafName == "" || param.WafName == "" {
+		o.ServeError(http.StatusBadRequest, "WafName and WafAddr can not be empty")
+	}
+	resp, err := http.Get(param.WafAddr+"/api/stat")
+	if err != nil {
+		o.ServeError(http.StatusBadRequest, "failed to Request",err)
+	}
+	if resp.StatusCode != 200 {
+		o.ServeError(http.StatusBadRequest, "Response code not 200")
+	}
+	waf, err := waf.ConfigNewWaf(param.WafName,param.WafAddr)
+	if err != nil {
+		o.ServeError(http.StatusBadRequest, "failed to ConfigNewWaf", err)
+	}
+	var result = make(map[string]interface{})
+	result["waf"] = waf
+	o.Serve(result)
+	// o.Ctx.WriteString("test")
 }
