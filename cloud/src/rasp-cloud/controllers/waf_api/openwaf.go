@@ -96,6 +96,12 @@ func (o *WafController) ConfigNewWafWithStatus()  {
 	body, err := ioutil.ReadAll(resp.Body)
 	var wafStatusResp *waf.WafStatusResp
 	json.Unmarshal(body,&wafStatusResp)
+	// var wafInput *waf.Waf
+	// wafInput.Name = param.WafName
+	// wafInput.Addr = param.WafAddr
+	// json.Unmarshal(body,&wafInput.WafStatusResp)
+	// wafInput.WafStatusResp = wafStatusResp
+	// waf,err :=waf.ConfigNewWafWithStatus(wafInput)
 	waf, err := waf.ConfigNewWafWithStatus(param.WafName,param.WafAddr,wafStatusResp)
 	// waf, err := waf.ConfigNewWaf(param.WafName,param.WafAddr)
 	if err != nil {

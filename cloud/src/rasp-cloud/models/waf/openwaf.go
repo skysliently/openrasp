@@ -159,16 +159,17 @@ func ConfigNewWaf(wafName string, wafAddr string) (result *Waf, err error) {
 }
 
 func ConfigNewWafWithStatus(wafName string, wafAddr string, wafStatusResp *WafStatusResp) (result *Waf, err error) {
-	wafInput := Waf{
-		Name:              wafName,
-		Addr:              wafAddr,
-	}
-	wafInput.WafStatusResp = wafStatusResp
-	waf, err := AddWaf(wafInput)
+	wafreturn, err := AddWaf(&Waf{
+		Name:            wafName,
+		Addr:            wafAddr,
+		WafStatusResp:   *wafStatusResp,
+	})
+// func ConfigNewWafWithStatus(waf *Waf) (result *Waf, err error) {
+// 	wafreturn, err := AddWaf(waf)
 	if err != nil {
 		return nil,errors.New("failed to config new waf: " + err.Error())
 	}
-	result, err = GetWafById(waf.Id)
+	result, err = GetWafById(wafreturn.Id)
 	if err != nil {
 		return nil,errors.New("failed to GetWafById: " + err.Error())
 	}
