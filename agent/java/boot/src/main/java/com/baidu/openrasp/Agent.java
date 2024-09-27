@@ -31,12 +31,18 @@ import static com.baidu.openrasp.Module.START_MODE_NORMAL;
  * Created by tyy on 3/27/17.
  * 加载agent的入口类，先于主函数加载
  */
+
+/**
+ * Agent类，使用java agent方式对类进行插桩
+*/
 public class Agent {
 
     public static String projectVersion;
     public static String buildTime;
     public static String gitCommit;
-
+/**
+ * Agent main方法，readVersion方法时实例化触发，输出版本帮助信息等
+ * */
     public static void main(String[] args) {
         try {
             Options options = new Options();
@@ -76,7 +82,7 @@ public class Agent {
      * @param agentArg 启动参数
      * @param inst     {@link Instrumentation}
      */
-    public static void agentmain(String agentArg, Instrumentation inst) {
+        public static void agentmain(String agentArg, Instrumentation inst) {
         init(Module.START_MODE_ATTACH, agentArg, inst);
     }
 

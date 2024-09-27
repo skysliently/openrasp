@@ -69,8 +69,16 @@ type Flag struct {
 	Upgrade   *string
 }
 
+type TestOpenWaf struct {
+	OwAddr []string
+}
+
 var (
 	AppConfig = &RaspAppConfig{}
+)
+
+var (
+	AppConfigWaf = &TestOpenWaf{}
 )
 
 func InitConfig(startFlag *Flag) {
@@ -103,6 +111,7 @@ func InitConfig(startFlag *Flag) {
 	AppConfig.LogMaxDays = beego.AppConfig.DefaultInt("LogMaxDays", 10)
 	AppConfig.DebugModeEnable = beego.AppConfig.DefaultBool("DebugModeEnable", false)
 	ValidRaspConf(AppConfig)
+	initOpenWafConfig()
 }
 
 func initArrayConfig(config []string) []string {
@@ -162,4 +171,10 @@ func ValidRaspConf(config *RaspAppConfig) {
 
 func failLoadConfig(msg string) {
 	tools.Panic(tools.ErrCodeConfigInitFailed, msg, nil)
+}
+
+//测试openwaf配置
+func initOpenWafConfig()  {
+	AppConfigWaf.OwAddr = initArrayConfig(strings.Split(beego.AppConfig.String("OwAddr"), ","))
+	// AppConfigWaf.OwAddr = beego.AppConfig.String("OwAddr")
 }

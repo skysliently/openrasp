@@ -36,6 +36,7 @@ func init() {
 	beego.InsertFilter("/v1/iast/version", beego.BeforeRouter, authAgent)
 	beego.InsertFilter("/v1/user/islogin", beego.BeforeRouter, authApi)
 	beego.InsertFilter("/v1/user/default", beego.BeforeRouter, authApi)
+	// beego.InsertFilter("/v1/waf/*", beego.BeforeRouter, authApi)
 }
 
 func authAgent(ctx *context.Context) {
